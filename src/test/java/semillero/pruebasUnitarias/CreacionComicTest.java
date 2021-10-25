@@ -1,24 +1,29 @@
-package semillero.pruebasUnitarias;
+package com.hbt.semillero;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
-import org.testng.annotations.Test;
+import org.junit.Assert;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
-
-import com.hbt.semillero.enums.*;
+import org.testng.annotations.Test;
 
 import com.hbt.semillero.dto.ComicDTO;
+import com.hbt.semillero.enums.EstadoEnum;
+import com.hbt.semillero.enums.TematicaEnum;
+
+
+
 
 public class CreacionComicTest {
 	/**
 	 * Constante que contendra el log de la clase AritmeticaTest
 	 */
-	private final static Logger log = Logger.getLogger(OperacionesAritmeticasTest.class);
+	private final static Logger log = Logger.getLogger(CreacionComicTest.class);
 	
 	@BeforeTest
 	public void inicializar() {
@@ -29,6 +34,12 @@ public class CreacionComicTest {
 	LocalDate ahora = LocalDate.now();
 	ArrayList<ComicDTO> comics = new ArrayList<ComicDTO>();
 	
+	
+	public CreacionComicTest() {
+		super();
+		CrearComits();
+	}
+
 	public void CrearComits() {
 		ComicDTO comic1= new ComicDTO(20L , "TRUELOVE", "WEBTOONS", TematicaEnum.AVENTURAS, "C1", 154, new BigDecimal(250000), "Maria Becerra", false , ahora, EstadoEnum.INACTIVO, 1000);
 		comics.add(comic1);
@@ -53,9 +64,8 @@ public class CreacionComicTest {
 	}
 
 	private ArrayList<ComicDTO> ComicsActivos() {
-		CrearComits();
 		ArrayList<ComicDTO> comicsActivos = new ArrayList<ComicDTO>();
-		for(int i = 0; i <= comics.size(); i++) {
+		for(int i = 0; i < comics.size(); i++) {
 			if(comics.get(i).getEstado() == EstadoEnum.ACTIVO ) {
 				comicsActivos.add(comics.get(i));
 			}
@@ -63,31 +73,47 @@ public class CreacionComicTest {
 		return comicsActivos;
 	}
 	
-	private ArrayList<ComicDTO> ComicsInactivos() {
-		CrearComits();
-		ArrayList<ComicDTO> comicsInactivos = new ArrayList<ComicDTO>();
-		for(int i = 0; i <= comics.size(); i++) {
-			if(comics.get(i).getEstado() == EstadoEnum.INACTIVO) {
-				comicsInactivos.add(comics.get(i));
+	private ArrayList<ComicDTO> ComicsInactivos() throws Exception {
+		int sizeL =  this.comics.size();
+		int activos=0,inactivos=0;
+		ArrayList<String> comicsInactivos = new ArrayList<String>();
+		for (ComicDTO dto: comics) {
+			if(dto.getEstado() == EstadoEnum.ACTIVO ) {
+				activos++;
+			}
+			if(dto.getEstado() == EstadoEnum.INACTIVO ) {
+				inactivos++;
+				comicsInactivos.add(dto.getNombre());
 			}
 		}
-		return comicsInactivos;
+		
+		throw new Exception("Se ha detectado que de "+sizeL+" comics se encontraron que "+activos+" se encunetran activos y "+inactivos+" inactivos. Los comics inactivos son:"+Arrays.toString(comicsInactivos.toArray()));
 	}
 	
 	
 	@Test
 	public void ValidarComicsActivos() {
-		ComicsActivos();
+		ArrayList<ComicDTO>  activos = ComicsActivos();
 		log.info("Inicia ejecucion del HOLA metodo ValidarComicsActivos()");
-		
-		/*for(int i = 0; i <= res.size(); i++) {
-			System.out.println(res.get(i).getNombre());
-		}*/
-			
-		System.out.println("puto");
-		
+		for(ComicDTO dto : activos) {
+			System.out.println(dto);
+			Assert.assertEquals(dto.getEstado(),EstadoEnum.ACTIVO);
+		}
 		log.info("Finaliza la ejecucion del metodo ValidarComicsActivos()");
 	}
+	
+	@Test
+	public void ValidarComicsInactivos() {
+		log.info("Inicia ejecucion del HOLA metodo ValidarComicsInactivos()");
+		try {
+			ComicsInactivos();
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			Assert.assertNotNull(e.getMessage());
+		}
+		log.info("Finaliza la ejecucion del metodo ValidarComicsInactivos()");
+	}
+	
 	
 	
 	
