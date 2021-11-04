@@ -24,7 +24,7 @@
 			<activation>
 				<property>
 					<name>skipAngular</name>
-					<value>!true</value>
+					<value>true</value>
 				</property>
 			</activation>
 			<build>

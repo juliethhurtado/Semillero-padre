@@ -15,6 +15,6 @@
 		<module>semillero-servicios</module>
 		<module>semillero-web</module>
 		<module>semillero-ear</module>
-  </modules>
+	</modules>
 </project>
 	
