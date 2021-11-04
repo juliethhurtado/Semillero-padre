@@ -135,8 +135,8 @@ public class GestionarComicBean implements IGestionarComicLocal {
 				+ " FROM Comic c WHERE LENGTH(c.nombre)> :lengthComic";
 		String consultaMenores = "SELECT c.nombre "
 				+ " FROM Comic c WHERE LENGTH(c.nombre)< :lengthComic";
-		List<Object[]> listaMayores = new ArrayList<Object[]>() ;
-		List<Object[]> listaMenores= new ArrayList<Object[]>() ;
+		List<String> listaMayores = new ArrayList<String>() ;
+		List<String> listaMenores= new ArrayList<String>() ;
 		
 		List<String> listaStringMenores= new ArrayList<String>() ;
 		List<String> listaStringMayores= new ArrayList<String>() ;
@@ -146,15 +146,15 @@ public class GestionarComicBean implements IGestionarComicLocal {
 			Query consultaNativa = em.createQuery(consultaMayores);
 			consultaNativa.setParameter("lengthComic", lengthComic.intValue());
 			listaMayores = consultaNativa.getResultList();
-			for(Object[] data :  listaMayores) {
-				listaStringMayores.add(data[0].toString());
+			for(String data :  listaMayores) {
+				listaStringMayores.add(data);
 			}
 			
 			Query consultaNativa2 = em.createQuery(consultaMenores);
 			consultaNativa2.setParameter("lengthComic", lengthComic.intValue());
 			listaMenores = consultaNativa2.getResultList();
-			for(Object[] data :  listaMenores) {
-				listaStringMenores.add(data[0].toString());
+			for(String data :  listaMenores) {
+				listaStringMenores.add(data);
 			}
 				
 			consultarComicTamanioNombreDTO.setExitoso(true);
