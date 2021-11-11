@@ -2,6 +2,7 @@ package com.hbt.semillero.ejb;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -12,17 +13,20 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
+import org.apache.log4j.Logger;
+
 import com.hbt.semillero.dto.ComicDTO;
 import com.hbt.semillero.dto.ComicTamanioNombreDTO;
 import com.hbt.semillero.dto.ConsultaNombrePrecioComicDTO;
 import com.hbt.semillero.dto.ConsultarComicTamanioNombreDTO;
 import com.hbt.semillero.dto.ResultadoDTO;
 import com.hbt.semillero.entidad.Comic;
+import com.hbt.semillero.rest.GestionComicRest;
 
 @Stateless
 @TransactionManagement(TransactionManagementType.CONTAINER)
 public class GestionarComicBean implements IGestionarComicLocal {
-
+	private final static Logger log = Logger.getLogger(GestionarComicBean.class);
 	@PersistenceContext
 	public EntityManager em;
 
@@ -45,6 +49,8 @@ public class GestionarComicBean implements IGestionarComicLocal {
 
 		return consultaNombrePrecioDTO;
 	}
+	
+	
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
@@ -64,7 +70,24 @@ public class GestionarComicBean implements IGestionarComicLocal {
 	}
 
 	@Override
-	public ResultadoDTO actualizarComic(Long idComic) {
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public ComicDTO editarComic(ComicDTO comicDTO) throws Exception {
+		
+		if(comicDTO.getId() == null) {
+			throw new Exception("El comic no se encuentra");
+		}
+		
+		ComicDTO comicDTOResult = null;
+		Comic comic = this.convertirComicDTOToComic(comicDTO);
+		em.persist(comic);
+		comicDTOResult = this.convertirComicToComicDTO(comic);
+		comicDTOResult.setExitoso(true);
+		comicDTOResult.setMensajeEjecucion("El comic ha sido creado exitosamente");
+		return comicDTOResult;
+	}
+	
+	@Override
+	public ResultadoDTO actualizarComic(ComicDTO comic) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -76,7 +99,7 @@ public class GestionarComicBean implements IGestionarComicLocal {
 	}
 
 	@Override
-	public List<ComicDTO> consultarComics() {
+	public List<ComicDTO> consultarComics(ComicDTO criterio) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -88,7 +111,7 @@ public class GestionarComicBean implements IGestionarComicLocal {
 	 * @param comic
 	 * @return
 	 */
-	private ComicDTO convertirComicToComicDTO(Comic comic) {
+	public ComicDTO convertirComicToComicDTO(Comic comic) {
 		ComicDTO comicDTO = new ComicDTO();
 		comicDTO.setId(comic.getId());
 		comicDTO.setNombre(comic.getNombre());
@@ -104,7 +127,7 @@ public class GestionarComicBean implements IGestionarComicLocal {
 		comicDTO.setCantidad(comic.getCantidad());
 		return comicDTO;
 	}
-
+				
 	/**
 	 * 
 	 * Metodo encargado de transformar un comicDTO a un comic
@@ -169,5 +192,25 @@ public class GestionarComicBean implements IGestionarComicLocal {
 		return consultarComicTamanioNombreDTO;
 		
 		}
+
+
+
+	@Override
+	public List<ComicDTO> listarComics() throws Exception {
+		List <Comic> comicResultList = new ArrayList<Comic>();
+		List <ComicDTO> comicDTOResultList  = null ;
+		try {
+			String listarLosComics = "SELECT * FROM comic ";
+			Query queryComics = em.createNativeQuery(listarLosComics, Comic.class);
+			comicResultList = (List<Comic>) queryComics.getResultList();
+			comicDTOResultList = comicResultList.stream()
+					.map(this::convertirComicToComicDTO)
+					.collect(Collectors.toList());
+		}  catch (Exception e) {
+			
+			log.info("SE HA PRESENTADO UN ERROR TECNICO" +  e.getMessage());
+		}
+		return comicDTOResultList;
+	}
 }
 	

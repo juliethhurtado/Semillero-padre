@@ -13,7 +13,7 @@ export class AppComponent {
   }  
 
   ngOnInit(): void {
-    this.router.navigate(['bienvenida']);    
+    this.router.navigate(['gestionar-comic']);    
     
   }
 }

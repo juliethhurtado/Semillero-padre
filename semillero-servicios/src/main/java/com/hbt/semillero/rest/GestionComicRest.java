@@ -1,5 +1,6 @@
 package com.hbt.semillero.rest;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.ejb.EJB;
@@ -88,6 +89,15 @@ public class GestionComicRest {
 	@SuppressWarnings("unchecked")
 	public String Prueba() {
 		return "";
+	}
+	
+	
+	@GET
+	@Path("/listarComics")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public List <ComicDTO> listarComics() throws Exception  {
+			return this.gestionarComicLocal.listarComics();
 	}
 
 	
